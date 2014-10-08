@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/python3
 
 import time
 import re
@@ -33,9 +33,9 @@ class Description:
         #Assume we want to write to project description file, otherwise to the provided stream
         if stream is None:
             with open(self.__root_path, 'w') as f:
-                f.write(self.html())
+                f.write(self.to_html())
         else:
-            stream.write(self.html())
+            stream.write(self.to_html())
     
     @staticmethod
     def __getCreator(line):
@@ -50,22 +50,28 @@ class Description:
     @classmethod
     def from_html(cls, project, html):
     
-        content = []
-        count = 0
+        content_lines = []
+        remove_tags = ["<p>", "<b>", "</p>", "</b>", "<br>"]
+                
         for line in html:
-            count += 1
+            
+            for tag in remove_tags:
+                line = line.replace(tag, "")
+            
+            line = line.strip()
+            
             line_has_creator = "<creator>" in line
             line_has_date = "<date>" in line
+            line_is_title = "<title>" in line
             
-            if line_has_creator or line_has_date:
-                if line_has_creator:
-                    creator = cls.__getCreator(line)
-                if line_has_date:
-                    date = cls.__getDate(line)
-            else:
-                content.append(line)
-        
-        print(content)
+            if any(c.isalpha() for c in line):
+                if line_has_creator or line_has_date:
+                    if line_has_creator:
+                        creator = cls.__getCreator(line)
+                    if line_has_date:
+                        date = cls.__getDate(line)
+                else:
+                    content_lines.append(line)
         
         return cls(project, content_lines, creator, date)
     
@@ -75,11 +81,11 @@ class Description:
             return load_from_html(f.readlines())
             
         
-    def html(self):
+    def to_html(self):
 
         description_html = """
         <p>
-            <b>%s</b>
+            <b>%s</b><br>
             %s
             <br>
             <br>
@@ -107,17 +113,23 @@ if __name__ == "__main__":
 
     # Do some basic testing of the Description class
     
-    desc_html = """
-    <p>A sample description<br>
-    With some linebreaks<br></p>
-    %s""" % Description.get_creation_line("JamesF", "08-Aug-14")
+    in_html = """
+    <p>
+        <b>A sample description<b><br>
+        With some linebreaks
+        <br>
+        <br>
+        %s
+    </p>
+    """ % Description.get_creation_line("JamesF", "08-Aug-14")
     
-    desc = Description.from_html("Project Name", desc_html.split('\n'))
-    
-    print(desc.project_name)
-    print(desc.content)
-    print(desc.creator)
-    print(desc.create_date)
-    
-    print(desc.html())
+    desc = Description.from_html("Project Name", in_html.split('\n'))
+    out_html = desc.to_html()
+
+    print("In:")
+    print(in_html)
+
+    print("Out:")
+    print(out_html)
+
     
