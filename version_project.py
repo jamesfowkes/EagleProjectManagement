@@ -4,6 +4,7 @@ import os
 import shutil
 import time
 
+from description import Description
 
 def get_arg_parser():
     """ Return a command line argument parser for this module """
@@ -57,9 +58,7 @@ def up_project_version(name, increment=1.0):
     
     shutil.copytree(old_version, new_version)
     
-    set_description_creator(new_version, creator)
-    
-        
+
 def main():
     arg_parser = get_arg_parser()
     args = arg_parser.parse_args()

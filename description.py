@@ -18,13 +18,11 @@ class Description:
         else:
             self.create_date = create_date
             
-        self.content_lines = content_lines
+        self.content_lines = content_lines 
        
-    @property
     def __root_path(self):
         return self.description_path_for_project(self.project_name)
     
-    @property
     def __version_path(self, version):
         return self.description_path_for_project_version(self.project_name, version)
         
@@ -32,11 +30,20 @@ class Description:
 
         #Assume we want to write to project description file, otherwise to the provided stream
         if stream is None:
-            with open(self.__root_path, 'w') as f:
+            with open(self.__root_path(), 'w') as f:
                 f.write(self.to_html())
         else:
             stream.write(self.to_html())
-    
+            
+    def write_description_to_project_version(self, version, stream=None):
+
+        #Assume we want to write to project description file, otherwise to the provided stream
+        if stream is None:
+            with open(self.__version_path(version), 'w') as f:
+                f.write(self.to_html(version=version))
+        else:
+            stream.write(self.to_html(version=version))
+            
     @staticmethod
     def __getCreator(line):
         result = re.search('<creator>(.*)</creator>', line)
@@ -77,20 +84,35 @@ class Description:
     
     @classmethod
     def from_project(cls, project):
-        with open(self.description_path, 'r') as f:
-            return load_from_html(f.readlines())
+        with open(cls.description_path_for_project(project), 'r') as f:
+            return cls.from_html(project, f.readlines())
             
-        
-    def to_html(self):
+    @classmethod
+    def from_project_version(cls, project, version):
+        with open(cls.description_path_for_project_version(project, version), 'r') as f:
+            return cls.from_html(project, f.readlines())
+            
+    def to_html(self, version = None):
 
-        description_html = """
-        <p>
-            <b>%s</b><br>
-            %s
-            <br>
-            <br>
-            %s
-        </p>""" % (self.content_lines[0], ''.join(self.content_lines[1:]), self.__get_creation_line())
+        if version is None:
+            description_html = """
+            <p>
+                <b>%s</b><br>
+                %s
+                <br>
+                <br>
+                %s
+            </p>""" % (self.content_lines[0], ''.join(self.content_lines[1:]), self.__get_creation_line())
+        else:
+            description_html = """
+            <p>
+                <b>Version %s</b><br>
+                %s
+                <br>
+                <br>
+                %s
+            </p>"""% (version, ''.join(self.content_lines), self.__get_creation_line())
+        
             
         return description_html
     

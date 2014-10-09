@@ -22,13 +22,32 @@ def get_creator_from_input():
 def make_project(name):
 
     print("Creating project '%s'" % name)
-           
-    content = input("Project description (use <br> for line breaks):")
+
+    content = ""
+    while len(content) == 0:
+        content = input("Project description (use <br> for line breaks):")
+        
     creator = get_creator_from_input()
     
     description = Description(name, content, creator)
     shutil.copytree("Project_Template", name)
     description.write_description_to_project()
+
+    version_content = """
+    ToDo:
+        <ul>
+            <li>???</li>
+        </ul>
+    <br>
+        Completed:
+        <ul>
+            <li>???</li>
+        </ul>
+    <br>
+    """
+    
+    description = Description(name, version_content, creator)
+    description.write_description_to_project_version("1.0")
     
 def main():
     arg_parser = get_arg_parser()
