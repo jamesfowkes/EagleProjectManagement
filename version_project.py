@@ -1,10 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/python3
+
 import argparse
 import os
 import shutil
 import time
+import sys
 
-from description import Description
+from description import VersionDescription
 
 def get_arg_parser():
     """ Return a command line argument parser for this module """
@@ -21,7 +23,7 @@ def get_creation_date():
     
 def get_creator_from_input():
     
-    creator = raw_input("Project Creator:")
+    creator = input("Project Creator:")
     
     if creator == "":
         creator = "James Fowkes"
@@ -52,12 +54,17 @@ def up_project_version(name, increment=1.0):
     
     print("Incrementing project '%s' version %.1f to %.1f" % (name, old_version, new_version))
                
-    old_project_dir = "%s/%1.f" % old_version
-    new_project_dir = "%s/%1.f" % new_version
+    old_project_dir = "%s/%1.1f" % (name, old_version)
+    new_project_dir = "%s/%1.1f" % (name, new_version)
+
     creator = get_creator_from_input()
     
-    shutil.copytree(old_version, new_version)
+    shutil.copytree(old_project_dir, new_project_dir)
     
+    #Get the description from new project and write back
+    desc = VersionDescription.from_project_version(name, new_version)
+    desc.set_version(new_version)
+    desc.write_description()
 
 def main():
     arg_parser = get_arg_parser()

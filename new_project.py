@@ -4,7 +4,7 @@ import argparse
 import os
 import shutil
 import sys
-from description import Description
+from description import ProjectDescription, VersionDescription
 
 def get_arg_parser():
     """ Return a command line argument parser for this module """
@@ -17,37 +17,43 @@ def get_arg_parser():
     return arg_parser
    
 def get_creator_from_input():
-    creator = input("Project Creator:")
+    return input("Project Creator:")
+    
+def get_description_from_input():
+    
+    first_line = ""
+    while len(first_line) == 0:
+        first_line = input("Project description Line 1 (must exist):")
+        
+    line_count = 2
+    content = [first_line]
+    finished = False
+    
+    while not finished:
+        next_line = input("Project description Line %d (enter DONE to end):" % line_count)
+        line_count += 1
+        
+        finished = next_line == "DONE"
+        if not finished:
+            content.append(next_line)
+        else:
+            break
+            
+    return content
     
 def make_project(name):
 
     print("Creating project '%s'" % name)
 
-    content = ""
-    while len(content) == 0:
-        content = input("Project description (use <br> for line breaks):")
-        
+    content = get_description_from_input()
     creator = get_creator_from_input()
     
-    description = Description(name, content, creator)
+    description = ProjectDescription(name, creator, content[0], content[1:])
     shutil.copytree("Project_Template", name)
-    description.write_description_to_project()
-
-    version_content = """
-    ToDo:
-        <ul>
-            <li>???</li>
-        </ul>
-    <br>
-        Completed:
-        <ul>
-            <li>???</li>
-        </ul>
-    <br>
-    """
-    
-    description = Description(name, version_content, creator)
-    description.write_description_to_project_version("1.0")
+    description.write_description()
+ 
+    description = VersionDescription(name, creator, "1.0", ["???"], ["???"])
+    description.write_description()
     
 def main():
     arg_parser = get_arg_parser()
