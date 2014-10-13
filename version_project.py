@@ -72,10 +72,17 @@ def main():
 
     project_name = args.name[0] #Positional argument returned as array of one
     
-    if not os.path.exists(project_name):
-        sys.exit ("Project '%s' does not exist" % project_name)
+    eagle_projects_path = os.environ.get('EAGLE_PROJECTS_PATH')
     
-    up_project_version(project_name)
+    if eagle_projects_path is None:
+        sys.exit("Key EAGLE_PROJECTS_PATH was not found.")
+        
+    this_project_path = "%s/%s" % (eagle_projects_path, project_name)
+    
+    if not os.path.exists(this_project_path):
+        sys.exit ("Project '%s' does not exist in %s" % (project_name, eagle_projects_path))
+    
+    up_project_version(this_project_path)
     
 if __name__ == "__main__":
     main()

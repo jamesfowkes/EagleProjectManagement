@@ -86,7 +86,7 @@ class Description:
         
         self.project_name = project_name
         
-        if creator is None:
+        if creator in [None, ""]:
             self.creator = "James Fowkes"
         else:
             self.creator = creator
@@ -148,12 +148,13 @@ class ProjectDescription(Description):
         description_html = """
         <p>
             <b id='title'>%s</b>
-            <br/>
-            <br/>
+        </p>
+        <p>    
+           %s
+        </p>
+        <p>
             %s
-            <br/>
-            %s
-            </p>""" % (self.title, self.content_to_spans(self.content), self._get_creation_line())
+        </p>""" % (self.title, self.content_to_spans(self.content), self._get_creation_line())
 
         return description_html
     
@@ -211,11 +212,12 @@ class VersionDescription(Description):
         description_html = """
             <p>
                 <b>Version <ver>%s</ver></b>
-                <br/>
-                <br/>
+            </p>
+            <p>
                 %s
                 %s
-                <br/>
+            </p>
+            <p>
                 %s
             </p>""" % (self.version, self.__to_list(self.todo, "ToDo"), self.__to_list(self.done, "Done"), self._get_creation_line())
             
@@ -237,14 +239,14 @@ if __name__ == "__main__":
     in_html = """
     <p>
         <b id='title'>A sample description</b>
-        <br/>
-        <span id='desc'>With some linebreaks</span>
-        <br/>
-        <span id='desc'>between</span>
-        <br/>
-        <span id='desc'>lines</span>
-        <br/>
-        %s
+    </p>
+    <p>
+        <span id='desc'>With some linebreaks</span><br/>
+        <span id='desc'>between</span><br/>
+        <span id='desc'>lines</span><br/>
+    </p>
+    <p>
+    %s
     </p>
     """ % Description.get_creation_line("JamesF", "08-Aug-14")
     
